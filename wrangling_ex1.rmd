@@ -1,0 +1,105 @@
+---
+title: "Data Wrangling Example 1"
+author: "Christopher MW Brown"
+date: "June 20 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Wrangling Practice Excercise #1
+
+```{r message=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+refine_original <- read_csv("~/Desktop/refine_original.csv")
+tbl_df(refine_original)
+```
+
+# Ex 1 - Clean Up Brand Names
+
+```{r}
+refine_original <- refine_original %>% 
+  mutate(company, company = tolower(company)) %>%
+  mutate(company = case_when(company %in% c("phillips", "fillips", "phlips") ~ "philips", TRUE ~ company)) %>%
+  mutate(company = case_when(company %in% c("akz0", "ak zo") ~ "akzo", TRUE ~ company)) %>%
+  mutate(company = case_when(company %in% c("unilver") ~ "unilever", TRUE ~ company))
+```
+
+# Ex 2 - Seperate Product Code and Number
+
+```{r}
+refine_original <- refine_original %>% separate(`Product code / number`, c("Product Code", "Product Number"), sep = "-", remove = TRUE)
+```
+
+# Ex 3 - Add Product Catagories
+
+```{r}
+refine_original <- refine_original %>% 
+  mutate(`Product Catagory` = case_when(
+    `Product Code` %in% "p" ~ "Smartphone",
+    `Product Code` %in% "v" ~ "TV",
+    `Product Code` %in% "x" ~ "Laptop",
+    `Product Code` %in% "q" ~ "Tablet",
+    TRUE ~ `Product Code`))
+```
+
+# Ex 4 - Add Full Address For Geocoding
+
+```{r}
+refine_original <- refine_original %>% unite(`Full Address`, c(address, city, country), sep = ", ", remove = TRUE)
+```
+
+# Ex 5 - Create Dummy Variables For Company and Product Catagory
+
+#creating the variables for company
+```{r}
+'%!in%' <- function(x,y)!('%in%'(x,y))
+
+refine_original <- refine_original %>% 
+  mutate(company_philips = case_when(
+    company %in% "philips" ~ "1",
+    company %!in% ("philips") ~ "0",
+    TRUE ~ company)) %>%
+  mutate(company_akzo = case_when(
+    company %in% "akzo" ~ "1",
+    company %!in% ("akzo") ~ "0",
+    TRUE ~ company)) %>%
+  mutate(company_van_houten = case_when(
+    company %in% "van houten" ~ "1",
+    company %!in% ("van houten") ~ "0",
+    TRUE ~ company)) %>%
+  mutate(company_unilever = case_when(
+    company %in% "unilever" ~ "1",
+    company %!in% ("unilever") ~ "0",
+    TRUE ~ company))
+```
+
+#creating the variables for product catagory
+```{r}
+refine_original <- refine_original %>% 
+  mutate(product_smartphone = case_when(
+    `Product Code` %in% "p" ~ "1",
+    `Product Code` %!in% ("p") ~ "0",
+    TRUE ~ `Product Code`)) %>%
+  mutate(product_tv = case_when(
+    `Product Code` %in% "v" ~ "1",
+    `Product Code` %!in% ("v") ~ "0",
+    TRUE ~ `Product Code`)) %>%
+  mutate(product_laptop = case_when(
+    `Product Code` %in% "x" ~ "1",
+    `Product Code` %!in% ("x") ~ "0",
+    TRUE ~ `Product Code`)) %>%
+  mutate(product_tablet = case_when(
+    `Product Code` %in% "q" ~ "1",
+    `Product Code` %!in% ("q") ~ "0",
+    TRUE ~ `Product Code`))
+```
+
+##Export Project Out To .CSV
+```{r}
+write_csv(refine_original, "refine_clean.csv")
+```
