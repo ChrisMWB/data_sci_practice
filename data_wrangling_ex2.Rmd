@@ -40,6 +40,13 @@ titanic_data$boat[which(is.na(titanic_data$boat))] <- "None"
 
 ## Ex4 Creating New Column For 'Has Cabin'
 ```{r}
-titanic_data <- titanic_data %>% 
-  mutate()
+titanic_data <- titanic_data %>% mutate(has_cabin_number = cabin)
+
+titanic_data$has_cabin_number[which(!is.na(titanic_data$has_cabin_number))] <- '1'
+titanic_data$has_cabin_number[which(is.na(titanic_data$has_cabin_number))] <- '0'
+```
+
+## Ex5 Exporting out To CSV
+```{r}
+write_csv(titanic_data, "titanic_clean.csv")
 ```
