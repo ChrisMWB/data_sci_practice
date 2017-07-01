@@ -1,0 +1,45 @@
+---
+title: "data_wrangling_ex2"
+author: "Christopher MW Brown"
+date: "June 30 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Wrangling Practice Excercise #2
+
+```{r message=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+titanic_data <- read_csv("~/Desktop/titanic_original.csv")
+tbl_df(titanic_data)
+```
+
+## Ex1 Cleaning Up The Embarked Column 
+```{r}
+titanic_data$embarked[which(is.na(titanic_data$embarked))] <- "S"
+```
+
+## Ex2 Calculating Mean Age
+```{r}
+#calculating the mean (minus any NAs)
+mean_age <- mean(titanic_data$age, na.rm = TRUE)
+
+#filling in the gaps with the new mean
+titanic_data$age[which(is.na(titanic_data$age))] <- mean_age
+```
+
+## Ex3 Filling in Lifeboat Data
+```{r}
+titanic_data$boat[which(is.na(titanic_data$boat))] <- "None"
+```
+
+## Ex4 Creating New Column For 'Has Cabin'
+```{r}
+titanic_data <- titanic_data %>% 
+  mutate()
+```
